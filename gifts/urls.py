@@ -15,10 +15,9 @@ Including another URLconf
 """
 from django.conf.urls import include
 from django.contrib import admin
-from django.contrib.auth.models import User
 from django.urls import path
-from rest_framework import routers, serializers, viewsets
-from app.views import box_list, recipient_list, recipient_id, box_detail, box_min_price
+from rest_framework import routers
+from app.views import box_list, recipient_list, recipient_id, box_detail
 
 
 router = routers.DefaultRouter()
@@ -31,7 +30,6 @@ urlpatterns = [
     path('recipients/', recipient_list, name='recipients'),
     path('recipients/<int:pk>/', recipient_id, name='recipient'),
     path('product-sets/<int:pk>/', box_detail, name="box_detail"),
-    path('product-sets/?min_price/', box_min_price, name="box_min_price"),
 ]
 
 
