@@ -56,6 +56,7 @@ def box_list(request):
         boxes = response.json()
     except requests.exceptions.Timeout:
         return Response(status=status.HTTP_408_REQUEST_TIMEOUT)
+    
     if request.query_params:
         min_price = request.query_params.get('min_price')
         min_weight = request.query_params.get('min_weight')
