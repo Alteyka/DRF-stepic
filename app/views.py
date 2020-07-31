@@ -1,111 +1,56 @@
 from django.shortcuts import render
 from rest_framework.response import Response
+from rest_framework.viewsets import ViewSet, ModelViewSet
 from rest_framework.decorators import api_view
 from rest_framework import status
 import requests
+from django.shortcuts import get_object_or_404
+from app.models import ProductSets, Recipient, Order
+from app.serializers import ProductSetsSerializer, RecipientSerializer, OrderSerializer
 
 
-@api_view(http_method_names=['GET'])
-def recipient_list(request):
-    result_list = []
-    result_dict = {}
-    try:
-        response = requests.get('https://stepik.org/media/attachments/course/73594/recipients.json', timeout=40)
-        recipients = response.json()
-    except requests.exceptions.Timeout:
-        return Response(status=status.HTTP_408_REQUEST_TIMEOUT)
-    if response:
-        for recipient in recipients:
-            result_dict.update(recipient['info'])
-            result_dict.update(recipient['contacts'])
-            result_list.append(result_dict)
-    else:
-        return Response(status=status.HTTP_404_NOT_FOUND)
-    return Response(result_list)
+class ProductSetsViewSet(ViewSet):
+
+    def list(self, request):
+        queryset = ProductSets.objects.all()
+        serializer = ProductSetsSerializer(queryset, many=True)
+        return Response(serializer.data)
+
+    def retrieve(self, request, pk=None):
+        queryset = ProductSets.objects.all()
+        product_set = get_object_or_404(queryset, pk=pk)
+        serializer = ProductSetsSerializer(product_set)
+        return Response(serializer.data)
 
 
-@api_view(http_method_names=['GET'])
-def recipient_id(request, pk):
-    result_dict = {}
-    try:
-        response = requests.get('https://stepik.org/media/attachments/course/73594/recipients.json', timeout=40)
-        recipients = response.json()
-    except requests.exceptions.Timeout:
-        return Response(status=status.HTTP_408_REQUEST_TIMEOUT)
+class OrderViewSet(ViewSet):
 
-    for recipient in recipients:
-        if recipients.index(recipient) == pk:
-            response = recipient
-            result_dict.update(recipient['info'])
-            result_dict.update(recipient['contacts'])
-    if len(result_dict) == 0:
-        return Response(status=status.HTTP_404_NOT_FOUND)
-    if response:
-        return Response(result_dict)
+    def list(self, request):
+        queryset = Order.objects.all()
+        serializer = OrderSerializer(queryset, many=True)
+        return Response(serializer.data)
 
+    def retrieve(self, request, pk=None):
+        queryset = Order.objects.all()
+        order = get_object_or_404(queryset, pk=pk)
+        serializer = OrderSerializer(order)
+        return Response(serializer.data)
 
-@api_view(http_method_names=['GET'])
-def box_list(request):
-    result_list = []
-    price_weight_list = []
-    result_dict = {}
-    try:
-        response = requests.get(
-            'https://stepik.org/media/attachments/course/73594/presentsboxes.json',
-            timeout=40,)
-        boxes = response.json()
-    except requests.exceptions.Timeout:
-        return Response(status=status.HTTP_408_REQUEST_TIMEOUT)
-    
-    if request.query_params:
-        min_price = request.query_params.get('min_price')
-        min_weight = request.query_params.get('min_weight')
-        for box in boxes:
-            for item in list(box):
-                if item == "name" or item == "about" or item == "price" or item == "weight_grams":
-                    final_item = {item: box[item]}
-                    result_dict.update(final_item)
-            result_list.append(result_dict)
-            result_dict = {}
-        for box in result_list:
-            if not min_weight:
-                if box['price'] >= int(min_price):
-                    price_weight_list.append(box)
-            if not min_price:
-                if box['weight_grams'] >= int(min_weight):
-                    price_weight_list.append(box)
-        return Response(price_weight_list)
+    def create(self, request):
+        serializer = OrderSerializer(data=request.data)
+        if serializer.is_valid():
+            serializer.save()
+            return Response(serializer.data, status=status.HTTP_201_CREATED)
+        else:
+            return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
-    if response:
-        for box in boxes:
-            for item in list(box):
-                if item == "name" or item == "about" or item == "price" or item == "weight_grams":
-                    final_item = {item: box[item]}
-                    result_dict.update(final_item)
-            result_list.append(result_dict)
-            result_dict = {}
-    else:
-        return Response(status=status.HTTP_404_NOT_FOUND)
-    return Response(result_list)
-
-
-@api_view(http_method_names=['GET'])
-def box_detail(request, pk):
-    result_dict = {}
-    try:
-        response = requests.get(
-            'https://stepik.org/media/attachments/course/73594/presentsboxes.json',
-            timeout=40,)
-        boxes = response.json()
-    except requests.exceptions.Timeout:
-        return Response(status=status.HTTP_408_REQUEST_TIMEOUT)
-    if response:
-        for box in boxes:
-            if box["inner_id"] == pk:
-                for item in list(box):
-                    if item == "name" or item == "about" or item == "price" or item == "weight_grams":
-                        final_item = {item: box[item]}
-                        result_dict.update(final_item)
-        if len(result_dict) == 0:
-            return Response(status=status.HTTP_404_NOT_FOUND)
-        return Response(result_dict)
+    def update(self, request, pk=None):
+        queryset = Order.objects.all()
+        order = get_object_or_404(queryset, pk=pk)
+        serializer = OrderSerializer(order)
+        if serializer.data == request.data:
+            return Response(serializer.errors, status=status.HTTP_304_NOT_MODIFIED)
+        else:
+            if serializer.is_valid():
+                serializer.save()
+                return Response(serializer.data, status=status.HTTP_202_ACCEPTED)

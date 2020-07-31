@@ -17,19 +17,22 @@ from django.conf.urls import include
 from django.contrib import admin
 from django.urls import path
 from rest_framework import routers
-from app.views import box_list, recipient_list, recipient_id, box_detail
+# from app.views import box_list, recipient_list, recipient_id, box_detail
+from app.views import ProductSetsViewSet, OrderViewSet
 
 
 router = routers.DefaultRouter()
-
+router.register('product_sets', ProductSetsViewSet, basename='product_set')
+router.register('order', OrderViewSet, basename='order')
+urlpatterns = router.urls
 
 urlpatterns = [
     path('admin/', admin.site.urls),
     path('', include(router.urls)),
-    path('product-sets/', box_list, name='box_list'),
-    path('recipients/', recipient_list, name='recipients'),
-    path('recipients/<int:pk>/', recipient_id, name='recipient'),
-    path('product-sets/<int:pk>/', box_detail, name="box_detail"),
+    # path('product-sets/', box_list, name='box_list'),
+    # path('recipients/', recipient_list, name='recipients'),
+    # path('recipients/<int:pk>/', recipient_id, name='recipient'),
+    # path('product-sets/<int:pk>/', box_detail, name="box_detail"),
 ]
 
 

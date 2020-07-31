@@ -36,3 +36,6 @@ class Order(models.Model):
     recipient = models.ForeignKey('Recipient', on_delete=models.CASCADE)
     product_set = models.ForeignKey('ProductSets', on_delete=models.CASCADE)
     status = models.CharField(max_length=10, choices=PROCESS_CHOICES)
+
+    def __str__(self):
+        return str(self.delivery_datetime)
