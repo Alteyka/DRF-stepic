@@ -26,6 +26,7 @@ class OrderSerializer(ModelSerializer):
     class Meta:
         model = Order
         fields = [
+            'id',
             'order_created_datetime',
             'delivery_datetime',
             'delivery_address',
@@ -33,3 +34,21 @@ class OrderSerializer(ModelSerializer):
             'product_set',
             'status',
         ]
+
+
+class OrderStatusSerializer(ModelSerializer):
+    class Meta:
+        model = Order
+        fields = ['status']
+
+
+class OrderAddressSerializer(ModelSerializer):
+    class Meta:
+        model = Order
+        fields = ['delivery_address']
+
+
+class RecipientNameChangeSerializer(ModelSerializer):
+    class Meta:
+        model = Recipient
+        exclude = ['id', 'phone_number']

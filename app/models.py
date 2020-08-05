@@ -38,4 +38,4 @@ class Order(models.Model):
     status = models.CharField(max_length=10, choices=PROCESS_CHOICES)
 
     def __str__(self):
-        return str(self.delivery_datetime)
+        return str(self.recipient)

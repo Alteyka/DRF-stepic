@@ -16,14 +16,21 @@ Including another URLconf
 from django.conf.urls import include
 from django.contrib import admin
 from django.urls import path
-from rest_framework import routers
+from rest_framework.routers import DefaultRouter
 # from app.views import box_list, recipient_list, recipient_id, box_detail
-from app.views import ProductSetsViewSet, OrderViewSet
+from app.views import ProductSetsViewSet, OrderViewSet, RecipientViewSet
 
 
-router = routers.DefaultRouter()
-router.register('product_sets', ProductSetsViewSet, basename='product_set')
-router.register('order', OrderViewSet, basename='order')
+class MyRouter(DefaultRouter):
+    def __init__(self, *args, **kwargs):
+        self.trailing_slash = '/?'
+        super(DefaultRouter, self).__init__(*args, **kwargs)
+
+
+router = MyRouter()
+router.register('product_sets/?', ProductSetsViewSet, basename='product_set')
+router.register('orders/?', OrderViewSet, basename='order')
+router.register('recipients/?', RecipientViewSet, basename='recipient')
 urlpatterns = router.urls
 
 urlpatterns = [
