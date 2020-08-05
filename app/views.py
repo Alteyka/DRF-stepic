@@ -1,14 +1,21 @@
 from django.shortcuts import render
 from rest_framework.response import Response
-from rest_framework.viewsets import ViewSet, ModelViewSet
+from rest_framework.viewsets import ViewSet, GenericViewSet
 from rest_framework.decorators import action
 from rest_framework.pagination import LimitOffsetPagination
+from rest_framework import mixins
 from django_filters.rest_framework import DjangoFilterBackend
 from rest_framework import status
 import requests
 from django.shortcuts import get_object_or_404
 from app.models import ProductSets, Recipient, Order
 from app.serializers import *
+
+
+class OrderLimitOffsetPagination(LimitOffsetPagination):
+    limit_query_param = 'limit'
+    offset_query_param = 'offset'
+    max_limit = 1
 
 
 class ProductSetsViewSet(ViewSet):
@@ -32,6 +39,7 @@ class OrderViewSet(ViewSet):
     queryset = Order.objects.all()
     filter_backends = [DjangoFilterBackend]
     filterset_fields = ['order_created_datetime', 'delivery_datetime']
+    pagination_class = OrderLimitOffsetPagination
 
     def list(self, request):
         serializer = OrderSerializer(self.queryset, many=True)

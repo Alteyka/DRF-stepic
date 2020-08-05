@@ -28,9 +28,9 @@ class MyRouter(DefaultRouter):
 
 
 router = MyRouter()
-router.register('product_sets/?', ProductSetsViewSet, basename='product_set')
-router.register('orders/?', OrderViewSet, basename='order')
-router.register('recipients/?', RecipientViewSet, basename='recipient')
+router.register('product_sets?', ProductSetsViewSet, basename='product_set')
+router.register('orders?', OrderViewSet, basename='order')
+router.register('recipients?', RecipientViewSet, basename='recipient')
 urlpatterns = router.urls
 
 urlpatterns = [
